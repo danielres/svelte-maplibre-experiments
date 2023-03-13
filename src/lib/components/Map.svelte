@@ -1,60 +1,33 @@
 <script lang="ts">
-	import type { Map } from 'maplibre-gl';
-
-	import maplibregl from 'maplibre-gl';
-	import { onMount, onDestroy } from 'svelte';
 	import 'maplibre-gl/dist/maplibre-gl.css';
+	import superMap from './superMap';
 
-	let map: Map;
-	let markers: maplibregl.Marker[] = [];
-
-	onMount(() => {
-		map = new maplibregl.Map({
-			container: 'map',
-			style:
-				'https://api.maptiler.com/maps/streets/style.json?key=get_your_own_OpIi9ZULNHzrESv6T2vL',
-			center: [12.550343, 55.665957],
-			zoom: 8
-		});
-
-		map.on('click', (e) => {
-			const marker = new maplibregl.Marker().setLngLat([e.lngLat.lng, e.lngLat.lat]);
-			markers = [...markers, marker];
-			// marker.addTo(map);
-		});
-	});
-
-	onDestroy(() => {
-		if (map) map.remove();
-	});
-
-	$: {
-		markers;
-		markers.map((m) => m.addTo(map));
-	}
+	const { useMap, addMarker, removeMarker, markers } = superMap();
 </script>
 
-<div id="map" class="min-h-screen" />
-{#if markers.length}
-	<div
-		class="absolute top-6 left-6 border h-fit bg-sky-600 p-2 text-white rounded-xl grid gap-2 max-w-md"
-	>
-		<div>
-			{#each markers as marker}
-				<button
-					on:click={() => {
-						markers = markers.filter((e) => e !== marker);
-						marker.remove();
-					}}
-					>{JSON.stringify(marker.getLngLat(), null, 2)}
-				</button>
-			{/each}
-		</div>
-	</div>
-{/if}
+<div class="min-h-screen" use:useMap={{ center: [5, 50], zoom: 4 }} />
 
-<style lang="postcss">
-	button {
-		@apply bg-sky-700 p-4 rounded-lg w-full;
-	}
-</style>
+<div class="absolute w-[200px] top-8 left-6">
+	<div class="bg-sky-600 p-4 rounded-xl grid gap-4">
+		<button class="bg-sky-500 p-2 rounded-lg text-white w-full" on:click={addMarker} type="button">
+			Add marker
+		</button>
+
+		{#if $markers.length}
+			<div class="grid gap-2">
+				<h3 class="text-lg text-white">Markers</h3>
+
+				{#each $markers as marker}
+					<button
+						class="bg-sky-700 w-full text-white rounded-lg hover:bg-sky-800 p-2"
+						on:click={() => removeMarker(marker)}
+						type="button"
+					>
+						<div>Lng: {marker.getLngLat().lng}</div>
+						<div>Lat: {marker.getLngLat().lat}</div>
+					</button>
+				{/each}
+			</div>
+		{/if}
+	</div>
+</div>
