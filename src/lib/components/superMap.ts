@@ -41,6 +41,7 @@ export default function superMap() {
 		markers: markers$,
 		addMarker,
 		removeMarker,
-		useMap
+		useMap,
+		map: map$
 	};
 }
