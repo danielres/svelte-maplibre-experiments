@@ -14,12 +14,10 @@ export default function superMap() {
 			zoom: options.zoom || 1
 		});
 
-		map$.set(map);
+		map.on('load', () => map$.set(map));
 
 		return {
-			destroy: () => {
-				map.remove();
-			}
+			destroy: () => map.remove()
 		};
 	}
 
@@ -41,6 +39,7 @@ export default function superMap() {
 		markers: markers$,
 		addMarker,
 		removeMarker,
-		useMap
+		useMap,
+		map: map$
 	};
 }
